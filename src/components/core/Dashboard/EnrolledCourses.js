@@ -5,65 +5,60 @@ import ProgressBar from "@ramonak/react-progress-bar";
 
 const EnrolledCourses = () => {
   const { token } = useSelector((state) => state.auth);
-  const [enrolledCourses, setEnrolledCourses] = useState([]);
+
+  const [enrolledCourses, setEnrolledCourses] = useState(null);
 
   useEffect(() => {
     const getEnrolledCourses = async () => {
       try {
         const response = await getUserEnrolledCourses(token);
-        //setEnrolledCourses(response.data);
+        setEnrolledCourses(response);
       } catch (error) {
-        console.log("Error in getEnrolledCourses", error);
+        console.log("Unable to Fetch Enrolled Courses");
       }
     };
     getEnrolledCourses();
-  }, [token, enrolledCourses]);
-  return (
-    <div className="text-white">
-      <div>
-        {/* <div>Enrolled Courses</div> */}
-        {console.log("Enrolled Courses are ", enrolledCourses)}
-        {!enrolledCourses.length ? (
-          <div>No courses enrolled</div>
-        ) : (
-          <div>
-            <div>
-              <p>Course Name</p>
-              <p>Durations</p>
-              <p>Progress</p>
-            </div>
-            {enrolledCourses.map((course) => (
-              <div key={course._id}>
-                <div>
-                  <div>
-                    <img
-                      src={course.thumbnail}
-                      alt={`course-${course.name}`}
-                      className="aspect-square w-[78px] object-cover"
-                    />
-                    <div>
-                      <p>{course?.courseName}</p>
-                      <p>{course?.courseDescription}</p>
-                    </div>
-                  </div>
-                  <div>
-                    <p>{course?.totalDuration}</p>
-                  </div>
+  }, [token]);
 
-                  <div>
-                    <p>Progress: {course.progressPercentage || 0}%</p>
-                    <ProgressBar
-                      completed={course?.progressPercentage || 0}
-                      height="8px"
-                      isLabelVisible={false}
-                    />
-                  </div>
+  return (
+    <div className="text-white flex flex-col gap-y-4 justify-center items-center  text-xl">
+      <div>Enrolled Courses</div>
+      {!enrolledCourses ? (
+        <div>Loading...</div>
+      ) : !enrolledCourses.length ? (
+        <p>You have not enrolled in any course yet</p>
+      ) : (
+        <div>
+          <div>
+            <p>Course Name</p>
+            <p>Durations</p>
+            <p>Progress</p>
+          </div>
+          {/* Cards shure hote h ab */}
+          {enrolledCourses.map((course, index) => (
+            <div>
+              <div>
+                <img src={course.thumbnail} />
+                <div>
+                  <p>{course.courseName}</p>
+                  <p>{course.courseDescription}</p>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+
+              <div>{course?.totalDuration}</div>
+
+              <div>
+                <p>Progress: {course.progressPercentage || 0}%</p>
+                <ProgressBar
+                  completed={course.progressPercentage || 0}
+                  height="8px"
+                  isLabelVisible={false}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

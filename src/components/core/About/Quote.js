@@ -1,5 +1,5 @@
 import React from "react";
-import HightlightText from "../Hompage/HightlightText";
+import HightlightText from "../Homepage/HightlightText";
 
 const Quote = () => {
   return (

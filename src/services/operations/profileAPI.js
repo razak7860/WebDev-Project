@@ -13,6 +13,7 @@ export function getUserDetails(token, navigate) {
     const toastId = toast.loading("Loading...");
     dispatch(setLoading(true));
     try {
+      console.log({ token });
       const response = await apiConnector("GET", GET_USER_DETAILS_API, null, {
         Authorization: `Bearer ${token}`,
       });
@@ -40,12 +41,13 @@ export async function getUserEnrolledCourses(token) {
   let result = [];
   try {
     console.log("BEFORE Calling BACKEND API FOR ENROLLED COURSES");
+    console.log({ token });
     const response = await apiConnector(
       "GET",
       GET_USER_ENROLLED_COURSES_API,
       null,
       {
-        Authorisation: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       }
     );
     console.log("AFTER Calling BACKEND API FOR ENROLLED COURSES");

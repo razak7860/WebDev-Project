@@ -1,14 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
-import HighlightText from "../components/core/Hompage/HightlightText";
-import CTAButton from "../components/core/Hompage/Button";
+import HighlightText from "../components/core/Homepage/HightlightText";
+import CTAButton from "../components/core/Homepage/Button";
 import Banner from "../assets/Images/banner.mp4";
-import CodeBlocks from "../components/core/Hompage/CodeBlocks";
-import LearningLanguageSection from "../components/core/Hompage/LearningLanguageSection";
-import TimelineSection from "../components/core/Hompage/TimelineSection";
-import InstructorSection from "../components/core/Hompage/InstructorSection";
-import ExploreMore from "../components/core/Hompage/ExploreMore";
+import CodeBlocks from "../components/core/Homepage/CodeBlocks";
+import LearningLanguageSection from "../components/core/Homepage/LearningLanguageSection";
+import TimelineSection from "../components/core/Homepage/TimelineSection";
+import InstructorSection from "../components/core/Homepage/InstructorSection";
+import ExploreMore from "../components/core/Homepage/ExploreMore";
 import Footer from "../components/common/Footer";
 
 const HomePage = () => {
