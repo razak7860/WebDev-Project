@@ -50,15 +50,13 @@ export default function CourseBuilderForm() {
       // console.log("edit", result)
     } else {
       result = await createSection(
-        {
-          sectionName: data.sectionName,
-          courseId: course._id,
-        },
+        { sectionName: data.sectionName, courseId: course._id },
         token
       );
+      console.log("section result", result);
     }
     if (result) {
-      // console.log("section result", result)
+      console.log("section result", result);
       dispatch(setCourse(result));
       setEditSectionName(null);
       setValue("sectionName", "");
@@ -126,6 +124,9 @@ export default function CourseBuilderForm() {
             disabled={loading}
             text={editSectionName ? "Edit Section Name" : "Create Section"}
             outline={true}
+            onclick={() => {
+              console.log("clicked create section");
+            }}
           >
             <IoAddCircleOutline size={20} className="text-yellow-50" />
           </IconBtn>
@@ -140,6 +141,7 @@ export default function CourseBuilderForm() {
           )}
         </div>
       </form>
+      {console.log("course", course)}
       {course.courseContent.length > 0 && (
         <NestedView handleChangeEditSectionName={handleChangeEditSectionName} />
       )}

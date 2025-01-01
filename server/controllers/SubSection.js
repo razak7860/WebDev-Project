@@ -2,70 +2,60 @@ const Section = require("../models/Section");
 const SubSection = require("../models/SubSection");
 const { uploadImageToCloudinary } = require("../utils/imageUploader");
 
-// create SubSection
-
+// Create a new sub-section for a given section
 exports.createSubSection = async (req, res) => {
-  try {
-    // fetch data from request body
-    const { sectionId, title, timeDuration, description } = req.body;
-    // extract file/video
-    const video = req.files.videoFile;
-    //validation
-    if (!sectionId || !title || !timeDuration || !description || !video) {
-      return res.status(400).json({
+    try {
+      // Extract necessary information from the request body
+      const { sectionId, title, description } = req.body
+      const video = req.files.video
+  
+      // Check if all necessary fields are provided
+      if (!sectionId || !title || !description || !video) {
+        return res
+          .status(404)
+          .json({ success: false, message: "All Fields are Required" })
+      }
+      console.log(video)
+  
+      // Upload the video file to Cloudinary
+      const uploadDetails = await uploadImageToCloudinary(
+        video,
+        process.env.FOLDER_NAME
+      )
+      console.log(uploadDetails)
+      // Create a new sub-section with the necessary information
+      const SubSectionDetails = await SubSection.create({
+        title: title,
+        timeDuration: `${uploadDetails.duration}`,
+        description: description,
+        videoUrl: uploadDetails.secure_url,
+      })
+  
+      // Update the corresponding section with the newly created sub-section
+      const updatedSection = await Section.findByIdAndUpdate(
+        { _id: sectionId },
+        { $push: { subSection: SubSectionDetails._id } },
+        { new: true }
+      ).populate("subSection")
+  
+      // Return the updated section in the response
+      return res.status(200).json({ success: true, data: updatedSection })
+    } catch (error) {
+      // Handle any errors that may occur during the process
+      console.error("Error creating new sub-section:", error)
+      return res.status(500).json({
         success: false,
-        message: "All fields are mandatory",
-      });
+        message: "Internal server error",
+        error: error.message,
+      })
     }
-
-    // upload video to cloudinary
-    const uploadDetails = await uploadImageToCloudinary(
-      video,
-      process.env.FOLDER_NAME
-    );
-
-    // create a subsection
-    const subSectionDetails = await SubSection.create({
-      title,
-      timeDuration,
-      description,
-      videoUrl: uploadDetails.secure_url,
-    });
-    console.log("SubSection created successfully ", subSectionDetails);
-    // update section with this sub section Object ID
-    const updatedSection = await Section.findByIdAndUpdate(
-      sectionId,
-      {
-        $push: {
-          subSection: subSectionDetails._id,
-        },
-      },
-      { new: true }
-    ).populate("subSection");
-
-    //TODO log updated section here, add populate query
-
-    //return response
-    res.status(200).json({
-      success: true,
-      message: "Created subsection successfully",
-      updatedSection,
-    });
-  } catch (error) {
-    console.error("Error occurred while creating a subsection", error);
-    res.status(400).json({
-      success: false,
-      message: "Error occurred while creating a subsection",
-      error: error.message,
-    });
   }
-};
 
 //update subsection
 exports.updateSubSection = async (req, res) => {
   try {
-    const { sectionId, title, description } = req.body;
-    const subSection = await SubSection.findById(sectionId);
+    const { sectionId, subSectionId, title, description } = req.body;
+    const subSection = await SubSection.findById(subSectionId);
 
     if (!subSection) {
       return res.status(404).json({
@@ -93,8 +83,13 @@ exports.updateSubSection = async (req, res) => {
 
     await subSection.save();
 
+    const updatedSection = await Section.findById(sectionId).populate(
+      "subSection"
+    );
+
     return res.json({
       success: true,
+      data: updatedSection,
       message: "Section updated successfully",
     });
   } catch (error) {
@@ -105,38 +100,41 @@ exports.updateSubSection = async (req, res) => {
     });
   }
 };
+  exports.deleteSubSection = async (req, res) => {
+    try {
+      const { subSectionId, sectionId } = req.body;
+      await Section.findByIdAndUpdate(
+        { _id: sectionId },
+        {
+          $pull: {
+            subSection: subSectionId,
+          },
+        }
+      );
+      const subSection = await SubSection.findByIdAndDelete({
+        _id: subSectionId,
+      });
 
-//Delete subsection
-exports.deleteSubSection = async (req, res) => {
-  try {
-    const { subSectionId, sectionId } = req.body;
-    await Section.findByIdAndUpdate(
-      { _id: sectionId },
-      {
-        $pull: {
-          subSection: subSectionId,
-        },
+      if (!subSection) {
+        return res
+          .status(404)
+          .json({ success: false, message: "SubSection not found" });
       }
-    );
-    const subSection = await SubSection.findByIdAndDelete({
-      _id: subSectionId,
-    });
 
-    if (!subSection) {
-      return res
-        .status(404)
-        .json({ success: false, message: "SubSection not found" });
+      const updatedSection = await Section.findById(sectionId).populate(
+        "subSection"
+      );
+
+      return res.json({
+        success: true,
+        data: updatedSection,
+        message: "SubSection deleted successfully",
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while deleting the SubSection",
+      });
     }
-
-    return res.json({
-      success: true,
-      message: "SubSection deleted successfully",
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      success: false,
-      message: "An error occurred while deleting the SubSection",
-    });
-  }
-};
+  };

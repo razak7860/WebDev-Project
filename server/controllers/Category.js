@@ -37,7 +37,7 @@ exports.showAllCategories = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "All Category returned",
-      allCategory,
+      data: allCategory,
     });
   } catch (error) {
     console.error("Error occurred while fetching the Category");

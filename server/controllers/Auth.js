@@ -178,13 +178,13 @@ exports.login = async (req, res) => {
     }
     //generate JWT after password matching
     if (await bcrypt.compare(password, user.password)) {
-      payload = {
+      const payload = {
         email: user.email,
         id: user._id,
         accountType: user.accountType,
       };
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: "2h",
+        expiresIn: "24h",
       });
       user.token = token;
       user.password = "############";

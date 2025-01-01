@@ -20,7 +20,7 @@ const Navbar = () => {
     try {
       const result = await apiConnector("GET", categories.CATEGORIES_API);
       console.log("printing result ", result.data.allCategory);
-      setSubLinks(result.data.allCategory);
+      setSubLinks(result?.data?.data);
     } catch (error) {
       console.error("Couldn't fetch category list");
       console.error(error);
@@ -56,6 +56,7 @@ const Navbar = () => {
                       group-hover:opacity-100 group-hover:translate-y-[1.65em] lg:w-[300px]"
                       >
                         <div className="absolute left-[50%] top-0 -z-10 translate-x-[80%] translate-y-[-40%] h-6 w-6 rotate-45 rounded bg-richblack-5"></div>
+                        {console.log("printing sublinks", subLinks)}
                         {subLinks.map((sublink, index) => (
                           <Link to={`/catalog/${sublink.name}`} key={index}>
                             <p className="rounded-lg bg-transparent py-4 pl-4 ">
